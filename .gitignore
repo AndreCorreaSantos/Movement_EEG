@@ -2,3 +2,7 @@ physionet.org/
 env/
 spec/
 dataset/
+test_dataset/
+train_dataset/
+tiny_train_dataset/
+tiny_test_dataset/
