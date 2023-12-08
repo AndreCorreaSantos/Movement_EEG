@@ -61,6 +61,8 @@ def parse_args():
     parser.add_argument("--batch_size", type=int, default=1, help="Batch size for the dataset.")
     parser.add_argument("--stride", type=int, default=100, help="Stride value for splitting time series.")
     parser.add_argument("--n_steps", type=int, default=700, help="Number of steps for each instance.")
+    parser.add_argument("--tiny",type=float,default=0.2,help="Tiny dataset size")
+    parser.add_argument("--save",type=bool,default=False,help="Save full train and test datasets")
     return parser.parse_args()
 
 if __name__ == "__main__":
@@ -76,29 +78,25 @@ if __name__ == "__main__":
 
     full_dataset = create_tf_dataset(basePath, n_steps, stride, batch_size)
 
-    # Determine the number of elements in 80% of the dataset
+
     dataset_size = tf.data.experimental.cardinality(full_dataset).numpy()
     train_size = int(0.8 * dataset_size)
 
-    # Create the training dataset
-    train_dataset = full_dataset.take(train_size)
-    tf.data.experimental.save(train_dataset, 'train_dataset')
 
-    # Create the testing dataset
+    train_dataset = full_dataset.take(train_size)
     test_dataset = full_dataset.skip(train_size)
-    tf.data.experimental.save(test_dataset, 'test_dataset')
+    if args.save:
+        tf.data.experimental.save(train_dataset, 'train_dataset')
+        tf.data.experimental.save(test_dataset, 'test_dataset')
 
     # Create smaller datasets (20% of original size)
-    tiny_train_size = int(0.2 * train_size)
-    tiny_test_size = int(0.2 * (dataset_size - train_size))
+    tiny_train_size = int(args.tiny * train_size)
+    tiny_test_size = int(args.tiny * (dataset_size - train_size))
 
-    # Take 20% of the training dataset as the tiny training dataset
     tiny_train_dataset = train_dataset.take(tiny_train_size)
-    tf.data.experimental.save(tiny_train_dataset, 'tiny_train_dataset')
-
-    # Take 20% of the testing dataset as the tiny testing dataset
     tiny_test_dataset = test_dataset.take(tiny_test_size)
     tf.data.experimental.save(tiny_test_dataset, 'tiny_test_dataset')
+    tf.data.experimental.save(tiny_train_dataset, 'tiny_train_dataset')
 
     # Print shapes for verification
     for X, y in tiny_train_dataset.take(1):
