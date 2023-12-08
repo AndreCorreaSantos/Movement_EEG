@@ -3,6 +3,7 @@
 import mne
 import numpy as np
 import tensorflow as tf
+import argparse
 
 
 
@@ -55,16 +56,43 @@ def create_tf_dataset(basePath, n_steps, stride, batch_size):
 
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="Create TF dataset with specified parameters.")
+    parser.add_argument("--batch_size", type=int, default=1, help="Batch size for the dataset.")
+    parser.add_argument("--stride", type=int, default=100, help="Stride value for splitting time series.")
+    parser.add_argument("--n_steps", type=int, default=700, help="Number of steps for each instance.")
+    parser.add_argument("--tiny",type=float,default=0.05,help="Tiny dataset size")
+    parser.add_argument("--save",type=bool,default=False,help="Save full train and test datasets")
+    return parser.parse_args()
+
 if __name__ == "__main__":
+    # Parse command-line arguments
+    args = parse_args()
+
+    # Assign command-line arguments to variables
+    batch_size = args.batch_size
+    stride = args.stride
+    n_steps = args.n_steps
+
     basePath = "physionet.org/files/eegmmidb/1.0.0/"
-    n_steps = 700
-    stride = 100
-    batch_size = 1
 
     full_dataset = create_tf_dataset(basePath, n_steps, stride, batch_size)
-    # take
-    for X, y in full_dataset.take(1):
-        print(X.shape)
-        print(y.shape)
-    # saving dataset 
-    # tf.data.experimental.save(full_dataset, 'dataset')
+
+    dataset_size = full_dataset.reduce(0, lambda x,_: x+1).numpy()
+    train_size = int(0.8 * dataset_size)
+
+
+    train_dataset = full_dataset.take(train_size)
+    test_dataset = full_dataset.skip(train_size)
+    if args.save:
+        tf.data.experimental.save(train_dataset, 'train_dataset')
+        tf.data.experimental.save(test_dataset, 'test_dataset')
+
+    # Create smaller datasets (20% of original size)
+    tiny_train_size = int(args.tiny * train_size)
+    tiny_test_size = int(args.tiny * (dataset_size - train_size))
+
+    tiny_train_dataset = train_dataset.take(tiny_train_size)
+    tiny_test_dataset = test_dataset.take(tiny_test_size)
+    tf.data.experimental.save(tiny_test_dataset, 'tiny_test_dataset')
+    tf.data.experimental.save(tiny_train_dataset, 'tiny_train_dataset')
