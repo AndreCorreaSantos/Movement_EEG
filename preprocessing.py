@@ -3,6 +3,7 @@
 import mne
 import numpy as np
 import tensorflow as tf
+import argparse
 
 
 
@@ -55,16 +56,55 @@ def create_tf_dataset(basePath, n_steps, stride, batch_size):
 
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="Create TF dataset with specified parameters.")
+    parser.add_argument("--batch_size", type=int, default=1, help="Batch size for the dataset.")
+    parser.add_argument("--stride", type=int, default=100, help="Stride value for splitting time series.")
+    parser.add_argument("--n_steps", type=int, default=700, help="Number of steps for each instance.")
+    return parser.parse_args()
+
 if __name__ == "__main__":
+    # Parse command-line arguments
+    args = parse_args()
+
+    # Assign command-line arguments to variables
+    batch_size = args.batch_size
+    stride = args.stride
+    n_steps = args.n_steps
+
     basePath = "physionet.org/files/eegmmidb/1.0.0/"
-    n_steps = 700
-    stride = 100
-    batch_size = 1
 
     full_dataset = create_tf_dataset(basePath, n_steps, stride, batch_size)
-    # take
-    for X, y in full_dataset.take(1):
-        print(X.shape)
-        print(y.shape)
-    # saving dataset 
-    # tf.data.experimental.save(full_dataset, 'dataset')
+
+    # Determine the number of elements in 80% of the dataset
+    dataset_size = tf.data.experimental.cardinality(full_dataset).numpy()
+    train_size = int(0.8 * dataset_size)
+
+    # Create the training dataset
+    train_dataset = full_dataset.take(train_size)
+    tf.data.experimental.save(train_dataset, 'train_dataset')
+
+    # Create the testing dataset
+    test_dataset = full_dataset.skip(train_size)
+    tf.data.experimental.save(test_dataset, 'test_dataset')
+
+    # Create smaller datasets (20% of original size)
+    tiny_train_size = int(0.2 * train_size)
+    tiny_test_size = int(0.2 * (dataset_size - train_size))
+
+    # Take 20% of the training dataset as the tiny training dataset
+    tiny_train_dataset = train_dataset.take(tiny_train_size)
+    tf.data.experimental.save(tiny_train_dataset, 'tiny_train_dataset')
+
+    # Take 20% of the testing dataset as the tiny testing dataset
+    tiny_test_dataset = test_dataset.take(tiny_test_size)
+    tf.data.experimental.save(tiny_test_dataset, 'tiny_test_dataset')
+
+    # Print shapes for verification
+    for X, y in tiny_train_dataset.take(1):
+        print("Tiny Training Dataset - X shape:", X.shape)
+        print("Tiny Training Dataset - y shape:", y.shape)
+
+    for X, y in tiny_test_dataset.take(1):
+        print("Tiny Testing Dataset - X shape:", X.shape)
+        print("Tiny Testing Dataset - y shape:", y.shape)
