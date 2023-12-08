@@ -16,20 +16,22 @@ def recurrent_model(features):
 
 
 
-def wavenet(): # revisar implementacao
+def wavenet(filters=32, kernel_size=2, dilation_rates=(1, 2, 4, 8) * 2):
     model = Sequential()
-    model.add(tf.keras.layers.InputLayer(input_shape=[None, 5]))# 64 features
-    for rate in (1, 2, 4, 8) * 2:
+    model.add(tf.keras.layers.InputLayer(input_shape=[700, 64]))
+
+    for rate in dilation_rates:
         model.add(tf.keras.layers.Conv1D(
-            filters=32, kernel_size=2, padding="causal", activation="relu",
+            filters=filters, kernel_size=kernel_size, padding="causal", activation="relu",
             dilation_rate=rate))
         model.add(tf.keras.layers.Conv1D(filters=14, kernel_size=1))
+
     model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     return model
 
 def convolutionalModel():
     model = Sequential()
-    model.add(tf.keras.layers.InputLayer(input_shape=[None, 5]))
+    model.add(tf.keras.layers.InputLayer(input_shape=[700, 64]))
     model.add(tf.keras.layers.Conv1D(filters=32, kernel_size=2, padding="causal", activation="relu"))
     model.add(tf.keras.layers.Conv1D(filters=14, kernel_size=1))
     model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
