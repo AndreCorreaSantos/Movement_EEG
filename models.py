@@ -3,12 +3,10 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, LSTM
 
 
-features = 64
 
 
 
-
-def recurrent_model():
+def recurrent_model(features):
     model = Sequential()
     model.add(LSTM(units=64, activation="tanh", return_sequences=False, input_shape=(None, features)))
     model.add(Dense(units=3, activation="softmax"))
