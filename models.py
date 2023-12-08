@@ -1,15 +1,28 @@
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, LSTM
-
-
-
+from tensorflow.keras.layers import LSTM, Dense, Dropout, BatchNormalization, Bidirectional
 
 
 def recurrent_model(features):
     model = Sequential()
     model.add(LSTM(units=64, activation="tanh", return_sequences=False, input_shape=(None, features)))
     model.add(Dense(units=3, activation="softmax"))
+    model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    return model
+
+def recurrent_model_2(features, lstm_units=64, dropout_rate=0.5):
+    model = Sequential()
+
+    model.add(Bidirectional(LSTM(units=lstm_units, activation="tanh", return_sequences=True), input_shape=(None, features)))
+
+    model.add(BatchNormalization())
+
+    model.add(LSTM(units=lstm_units, activation="tanh", return_sequences=False))
+
+    model.add(Dropout(dropout_rate))
+
+    model.add(Dense(units=3, activation="softmax"))
+
     model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     return model
 
