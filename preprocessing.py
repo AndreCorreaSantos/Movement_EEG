@@ -62,7 +62,7 @@ def create_tf_dataset(basePath, n_steps, stride, batch_size):
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Create TF dataset with specified parameters.")
-    parser.add_argument("--batch_size", type=int, default=512, help="Batch size for the dataset.")
+    parser.add_argument("--batch_size", type=int, default=256, help="Batch size for the dataset.")
     parser.add_argument("--stride", type=int, default=100, help="Stride value for splitting time series.")
     parser.add_argument("--n_steps", type=int, default=200, help="Number of steps for each instance.")
     parser.add_argument("--tiny",type=float,default=0.05,help="Tiny dataset size")
@@ -96,7 +96,8 @@ if __name__ == "__main__":
     tiny_train_size = int(args.tiny * train_size)
     tiny_test_size = int(args.tiny * (dataset_size - train_size))
 
-    tiny_train_dataset = train_dataset.take(tiny_train_size)
-    tiny_test_dataset = test_dataset.take(tiny_test_size)
-    tf.data.experimental.save(tiny_test_dataset, 'tiny_test_dataset')
-    tf.data.experimental.save(tiny_train_dataset, 'tiny_train_dataset')
+    if not args.save:
+        tiny_train_dataset = train_dataset.take(tiny_train_size)
+        tiny_test_dataset = test_dataset.take(tiny_test_size)
+        tf.data.experimental.save(tiny_test_dataset, 'tiny_test_dataset')
+        tf.data.experimental.save(tiny_train_dataset, 'tiny_train_dataset')
