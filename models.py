@@ -24,6 +24,10 @@ def wavenet(filters=32, kernel_size=2, dilation_rates=(1, 2, 4, 8) * 2):
             dilation_rate=rate))
         model.add(tf.keras.layers.Conv1D(filters=14, kernel_size=1))
 
+    model.add(tf.keras.layers.Flatten())  # Flatten the output of the convolutional layers
+    model.add(tf.keras.layers.Dense(100, activation='relu'))  # Optional additional dense layer
+    model.add(tf.keras.layers.Dense(3, activation='softmax'))  # Output layer for 3 classes
+
     model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     return model
 
