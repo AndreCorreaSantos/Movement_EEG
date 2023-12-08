@@ -35,6 +35,15 @@ Run the preprocessing script to generate preprocessed TensorFlow datasets:
 ```bash
 python preprocessing.py
 ```
+Create the tf dataset running
+```
+python preprocessing.py
+```
+It is possible to change the values passed to each variable, but any changes will have to be adjusted in the model loader in the master.ipynb.
+Example: 
+```
+python preprocessing.py --batch_size 2 --stride 100 --n_steps 700
+```
 
 This script handles the necessary steps to preprocess the EEGMMIDB dataset and prepares it for further analysis.
 
@@ -46,3 +55,4 @@ The initial models used in this project are sourced from the following repositor
 
 These models serve as a starting point for further development and experimentation with the EEGMMIDB dataset.
 
+https://github.com/ageron/handson-ml3/blob/main/15_processing_sequences_using_rnns_and_cnns.ipynb
