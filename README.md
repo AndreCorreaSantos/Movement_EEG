@@ -13,9 +13,13 @@ python -m venv
 ```
 Create the tf dataset running
 ```
-python script.py --batch_size 1 --stride 100 --n_steps 700
+python preprocessing.py
 ```
 It is possible to change the values passed to each variable, but any changes will have to be adjusted in the model loader in the master.ipynb.
+Example: 
+```
+python preprocessing.py --batch_size 2 --stride 100 --n_steps 700
+```
 
 Initial analysis and models taken from
 
