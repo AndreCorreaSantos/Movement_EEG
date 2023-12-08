@@ -3,7 +3,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout, BatchNormalization, Bidirectional
 
 
-def recurrent(features):
+def recurrent(features,batch_size=512):
     model = Sequential()
     model.add(LSTM(units=64, activation="tanh", return_sequences=False, input_shape=(None, features)))
     model.add(Dense(units=3, activation="softmax"))
@@ -27,9 +27,9 @@ def recurrent_2(features, lstm_units=64, dropout_rate=0.5):
     return model
 
 
-def wavenet(filters=32, kernel_size=2, dilation_rates=(1, 2, 4, 8) * 2):
+def wavenet(filters=32, kernel_size=2, dilation_rates=(1, 2, 4, 8) * 2, batch_size=512):
     model = Sequential()
-    model.add(tf.keras.layers.InputLayer(input_shape=[700, 64]))
+    model.add(tf.keras.layers.InputLayer(input_shape=[batch_size, 64]))
 
     for rate in dilation_rates:
 
@@ -45,9 +45,9 @@ def wavenet(filters=32, kernel_size=2, dilation_rates=(1, 2, 4, 8) * 2):
     model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     return model
 
-def convolutional():
+def convolutional(features,batch_size=512):
     model = Sequential()
-    model.add(tf.keras.layers.InputLayer(input_shape=[700, 64]))
+    model.add(tf.keras.layers.InputLayer(input_shape=[batch_size, 64]))
 
     model.add(tf.keras.layers.Conv1D(filters=32, kernel_size=3, padding="causal", activation="relu"))
     model.add(tf.keras.layers.BatchNormalization())
