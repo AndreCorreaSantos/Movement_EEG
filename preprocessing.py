@@ -61,7 +61,7 @@ def parse_args():
     parser.add_argument("--batch_size", type=int, default=1, help="Batch size for the dataset.")
     parser.add_argument("--stride", type=int, default=100, help="Stride value for splitting time series.")
     parser.add_argument("--n_steps", type=int, default=700, help="Number of steps for each instance.")
-    parser.add_argument("--tiny",type=float,default=0.2,help="Tiny dataset size")
+    parser.add_argument("--tiny",type=float,default=0.05,help="Tiny dataset size")
     parser.add_argument("--save",type=bool,default=False,help="Save full train and test datasets")
     return parser.parse_args()
 
@@ -78,8 +78,7 @@ if __name__ == "__main__":
 
     full_dataset = create_tf_dataset(basePath, n_steps, stride, batch_size)
 
-
-    dataset_size = tf.data.experimental.cardinality(full_dataset).numpy()
+    dataset_size = full_dataset.reduce(0, lambda x,_: x+1).numpy()
     train_size = int(0.8 * dataset_size)
 
 
@@ -97,12 +96,3 @@ if __name__ == "__main__":
     tiny_test_dataset = test_dataset.take(tiny_test_size)
     tf.data.experimental.save(tiny_test_dataset, 'tiny_test_dataset')
     tf.data.experimental.save(tiny_train_dataset, 'tiny_train_dataset')
-
-    # Print shapes for verification
-    for X, y in tiny_train_dataset.take(1):
-        print("Tiny Training Dataset - X shape:", X.shape)
-        print("Tiny Training Dataset - y shape:", y.shape)
-
-    for X, y in tiny_test_dataset.take(1):
-        print("Tiny Testing Dataset - X shape:", X.shape)
-        print("Tiny Testing Dataset - y shape:", y.shape)

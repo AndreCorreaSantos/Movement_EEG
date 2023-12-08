@@ -13,9 +13,6 @@ def recurrent_model(features):
     model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     return model
 
-
-
-
 def wavenet(features): # revisar implementacao
     model = Sequential()
     model.add(tf.keras.layers.InputLayer(input_shape=[None,features]))# 64 features
