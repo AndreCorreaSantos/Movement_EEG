@@ -11,7 +11,14 @@ Create env and install requirements.txt using
 ```
 python -m venv 
 ```
+Create the tf dataset running
+```
+python script.py --batch_size 1 --stride 100 --n_steps 700
+```
+It is possible to change the values passed to each variable, but any changes will have to be adjusted in the model loader in the master.ipynb.
 
 Initial analysis and models taken from
 
 https://github.com/ageron/handson-ml3/blob/main/15_processing_sequences_using_rnns_and_cnns.ipynb
+
+
