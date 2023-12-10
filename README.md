@@ -86,8 +86,13 @@ The `--tiny` argument allows for creating smaller datasets (`tiny_train_dataset`
 
 The following models were trained and tested with 5% of the original dataset separated into batches of 512 instances each, with a stride of 100 between the data points and 200 time steps per data point. Each model was trained with 30 epochs and the training and testing (validation) data do not overlap.
 
+#### Train and test accuracies
+
 ![Model Comparison](model_comparison.png)
 
+### Confusion matrices
+
+![confusion_matrix_comparison](confusion_matrix_comparison.png)
 
 - Recurrent: a simple recurrent neural network was the first tested model, it clearly did not yield good results as it did underfitted severely and only predicted a single class on the test set.
 - Recurrent Complex: a more complex recurrent neural network. It did also underfitted.
